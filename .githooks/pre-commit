@@ -1,0 +1,8 @@
+#!/bin/sh
+# Bloquea cualquier commit que incluya enunciados o inputs de Advent of Code.
+bad=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(^|/)(enunciados|inputs[^/]*|instructions[^/]*|instrucciones[^/]*)/')
+if [ -n "$bad" ]; then
+  echo "ERROR: enunciados/inputs de Advent of Code no se pueden subir al repositorio:" >&2
+  echo "$bad" >&2
+  exit 1
+fi

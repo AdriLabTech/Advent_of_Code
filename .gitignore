@@ -1,7 +1,25 @@
-# Advent of Code Inputs
+# ============================================================
+# CONTENIDO QUE NUNCA DEBE SUBIRSE (reglas de Advent of Code)
+# Ni los enunciados ni los inputs de puzzle se pueden redistribuir.
+# ============================================================
+enunciados/
+**/enunciados/
+inputs/
+**/inputs/
+**/inputs_*/
+**/instructions*/
+**/instrucciones*/
 
-**/inputs*/*.txt
-
-# Advent of Code Instructions
-
-**/instructions*/*.txt
+# Artefactos de compilación por lenguaje
+java/bin/
+**/__pycache__/
+*.pyc
+.venv/
+**/target/
+**/bin/Debug/
+**/bin/Release/
+**/obj/
+cpp/build/
+build/
+.idea/
+.vscode/

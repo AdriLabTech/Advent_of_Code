@@ -22,8 +22,10 @@ public class Utils {
      * @throws IOException -> If the path dont match
      */
     public static List<String> readInput(int year, int day) throws IOException {
-        String filePath = String.format("src/inputs_%d/Input_Day%02d.txt", year, day);
-        Path path = Paths.get(filePath);
+        // Los inputs viven fuera de java/ (compartidos entre lenguajes): inputs/<año>/dayNN.txt
+        // Por defecto se asume que se ejecuta desde java/; se puede cambiar con AOC_INPUTS_DIR.
+        String base = System.getenv().getOrDefault("AOC_INPUTS_DIR", "../inputs");
+        Path path = Paths.get(base, String.valueOf(year), String.format("day%02d.txt", day));
         return Files.readAllLines(path);
     }
 
