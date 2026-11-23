@@ -1,20 +1,31 @@
-# C++
+# ⚙️ C++
 
-Estado: **sin empezar** (estructura preparada, ningún día resuelto).
+Estilo: **funciones libres + autorregistro** (sin clases ni herencia). Cada día define `part1`/`part2` y una línea `AOC_REGISTER(año, día, part1, part2)`; CMake compila automáticamente todo lo que haya en `src/solutions/`.
 
-Sigue el contrato de [../docs/CONVENCIONES.md](../docs/CONVENCIONES.md):
+Requisitos: compilador C++20 (g++/clang++) y CMake 3.20+.
 
-- Input: `../inputs/<año>/dayNN.txt` (o `AOC_INPUTS_DIR`). No se versiona.
-- Cada día expone `part1` y `part2` y devuelve texto.
-- Ejecutor por año/día con tiempo de ejecución.
-
-## Requisitos
-- Compilador C++20 (g++/clang++) y CMake
-
-## Estructura sugerida
 ```
 cpp/
 ├── CMakeLists.txt
-└── src/y2025/day01.cpp
+├── src/
+│   ├── core/
+│   │   ├── aoc.hpp      # registro, AOC_REGISTER, ans, ints, paragraphs
+│   │   └── main.cpp     # CLI y ejecutor
+│   └── solutions/y2025/day01.cpp   # una solución = un fichero
+└── templates/day.cpp.tpl
 ```
-Ejecución prevista: `cmake -B build && cmake --build build && ./build/aoc 2025 1`
+
+## Crear un día
+```bash
+scripts/new_day.py cpp 2025 3        # desde la raíz del repo
+```
+Edita `part1(const Lines&)` y `part2`; devuelven `ans(resultado)` (`std::nullopt` = pendiente).
+
+## Compilar y ejecutar (desde `cpp/`)
+```bash
+cmake -B build -S . && cmake --build build
+./build/aoc 2025 3
+./build/aoc 2025               # todo el año
+./build/aoc 2025 3 --example
+```
+Tras crear un día nuevo basta con volver a ejecutar `cmake --build build`.

@@ -1,20 +1,27 @@
-# Python
+# 🐍 Python
 
-Estado: **sin empezar** (estructura preparada, ningún día resuelto).
+Estilo: **funcional y sin registro**. Cada día es un módulo con dos funciones; el ejecutor lo descubre por nombre.
 
-Sigue el contrato de [../docs/CONVENCIONES.md](../docs/CONVENCIONES.md):
+Requisitos: Python 3.12+ (sin dependencias).
 
-- Input: `../inputs/<año>/dayNN.txt` (o `AOC_INPUTS_DIR`). No se versiona.
-- Cada día expone `part1` y `part2` y devuelve texto.
-- Ejecutor por año/día con tiempo de ejecución.
-
-## Requisitos
-- Python 3.12+
-
-## Estructura sugerida
 ```
 python/
-├── aoc/            # lectura de input y ejecutor
-└── y2025/day01.py  # part1(lines) / part2(lines)
+├── aoc/                 # núcleo: lectura de inputs, helpers y ejecutor
+│   ├── io.py            #   read_lines, read_text, ints, paragraphs
+│   └── runner.py        #   descubre y ejecuta y{año}/day{NN}.py
+├── templates/day.py.tpl
+└── y2025/day01.py       # una solución = un fichero
 ```
-Ejecución prevista: `python -m aoc 2025 1`
+
+## Crear un día
+```bash
+scripts/new_day.py python 2025 3     # desde la raíz del repo
+```
+Edita `python/y2025/day03.py`: `part1(lines)` y `part2(lines)` devuelven el resultado (`None` = pendiente). Helpers: `ints(texto)`, `paragraphs(lines)`.
+
+## Ejecutar (desde `python/`)
+```bash
+python -m aoc 2025 3             # un día
+python -m aoc 2025               # todo el año
+python -m aoc 2025 3 --example   # usa inputs/2025/day03.example.txt
+```

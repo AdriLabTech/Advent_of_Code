@@ -16,9 +16,8 @@ java/bin/
 *.pyc
 .venv/
 **/target/
-**/bin/Debug/
-**/bin/Release/
-**/obj/
+csharp/bin/
+csharp/obj/
 cpp/build/
 build/
 .idea/

@@ -8,10 +8,10 @@
 [![License](https://img.shields.io/badge/Licencia-MIT-blue?style=for-the-badge)](LICENSE)
 
 ![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk&logoColor=white)
-![Python](https://img.shields.io/badge/Python-pendiente-lightgrey?logo=python&logoColor=white)
-![Rust](https://img.shields.io/badge/Rust-pendiente-lightgrey?logo=rust&logoColor=white)
-![C#](https://img.shields.io/badge/C%23-pendiente-lightgrey?logo=csharp&logoColor=white)
-![C++](https://img.shields.io/badge/C%2B%2B-pendiente-lightgrey?logo=cplusplus&logoColor=white)
+![Python](https://img.shields.io/badge/Python-listo-blue?logo=python&logoColor=white)
+![Rust](https://img.shields.io/badge/Rust-listo-blue?logo=rust&logoColor=white)
+![C#](https://img.shields.io/badge/C%23-listo-blue?logo=csharp&logoColor=white)
+![C++](https://img.shields.io/badge/C%2B%2B-listo-blue?logo=cplusplus&logoColor=white)
 
 [Lenguajes](#-lenguajes) · [Progreso](#-progreso) · [Empezar](#-empezar) · [Añadir una solución](#-añadir-una-solución) · [Reglas](#-enunciados-e-inputs-no-incluidos)
 
@@ -21,21 +21,42 @@
 
 ## 🗂️ Lenguajes
 
-| Lenguaje | Carpeta | Estado | Guía |
-|---|---|---|---|
-| ☕ Java | [`java/`](java/) | ✅ En uso (2025 completo, 2015 en curso) | [java/README.md](java/README.md) |
-| 🐍 Python | [`python/`](python/) | 🚧 Preparado, sin empezar | [python/README.md](python/README.md) |
-| 🦀 Rust | [`rust/`](rust/) | 🚧 Preparado, sin empezar | [rust/README.md](rust/README.md) |
-| 🟣 C# | [`csharp/`](csharp/) | 🚧 Preparado, sin empezar | [csharp/README.md](csharp/README.md) |
-| ⚙️ C++ | [`cpp/`](cpp/) | 🚧 Preparado, sin empezar | [cpp/README.md](cpp/README.md) |
+Cada lenguaje usa la estructura que mejor le encaja, pero todos cumplen el mismo contrato: **un día nuevo = un fichero** y el mismo ejecutor `<año> [día] [--example]`.
 
-Todos comparten estructura de datos y contrato de ejecución: [docs/CONVENCIONES.md](docs/CONVENCIONES.md).
+| Lenguaje | Estilo | Estado | Guía |
+|---|---|---|---|
+| ☕ Java | POO: `Calendar` / `Day` | ✅ En uso (2025 completo, 2015 en curso) | [java/](java/README.md) |
+| 🐍 Python | Módulos y funciones, descubrimiento por nombre | 🟢 Estructura lista | [python/](python/README.md) |
+| 🦀 Rust | Funciones libres, registro generado por `build.rs` | 🟢 Estructura lista | [rust/](rust/README.md) |
+| 🟣 C# | Clases con reflexión (sin registro manual) | 🟢 Estructura lista | [csharp/](csharp/README.md) |
+| ⚙️ C++ | Funciones libres + autorregistro con macro | 🟢 Estructura lista | [cpp/](cpp/README.md) |
+
+Convenciones comunes: [docs/CONVENCIONES.md](docs/CONVENCIONES.md).
+
+## ⚡ Resumen: cómo empezar una solución
+
+1. Pon tu input en `inputs/<año>/dayNN.txt` (y, si quieres, el ejemplo en `dayNN.example.txt`).
+2. Genera el esqueleto: `scripts/new_day.py <lenguaje|all> <año> <día>` (necesita Python 3).
+3. Programa `part1` y `part2` en el fichero creado.
+4. Ejecútalo desde la carpeta del lenguaje:
+
+| Lenguaje | Fichero que se crea | Ejecutar (desde su carpeta) |
+|---|---|---|
+| ☕ Java | `src/year_YYYY/Day_NN_YYYY.java` + `src/utils_YYYY/Utils_DayNN.java` (se registra solo) | `javac -d bin $(find src -name '*.java') && java -cp bin core.Main` |
+| 🐍 Python | `y2025/day03.py` | `python -m aoc 2025 3` |
+| 🦀 Rust | `src/solutions/y2025/day03.rs` | `cargo run --release -- 2025 3` |
+| 🟣 C# | `Solutions/Y2025/Day03.cs` | `dotnet run -c Release -- 2025 3` |
+| ⚙️ C++ | `src/solutions/y2025/day03.cpp` | `cmake -B build -S . && cmake --build build && ./build/aoc 2025 3` |
+
+Ejemplo: `scripts/new_day.py rust 2025 3` · `scripts/new_day.py all 2025 3` (todos a la vez).
+Sin día = año completo; `--example` usa `dayNN.example.txt` (no disponible en Java).
 
 ## 📊 Progreso
 
-Cada celda enlaza a la solución (✅) o queda pendiente (⬜). El número de día enlaza al puzzle en adventofcode.com.
+Despliega cada sección para ver su información. Cada celda enlaza a la solución (✅) o queda pendiente (⬜); el número de día enlaza al puzzle en adventofcode.com.
 
-### 🎅 2025
+<details>
+<summary><b>🎅 Progreso 2025</b> — Java 12/12 días</summary>
 
 | Día | ☕ Java | 🐍 Python | 🦀 Rust | 🟣 C# | ⚙️ C++ |
 |:---:|:---:|:---:|:---:|:---:|:---:|
@@ -52,7 +73,10 @@ Cada celda enlaza a la solución (✅) o queda pendiente (⬜). El número de d�
 | [11](https://adventofcode.com/2025/day/11) | [✅](java/src/year_2025/Day_11_2025.java) | ⬜ | ⬜ | ⬜ | ⬜ |
 | [12](https://adventofcode.com/2025/day/12) | [✅](java/src/year_2025/Day_12_2025.java) | ⬜ | ⬜ | ⬜ | ⬜ |
 
-### 🎅 2015
+</details>
+
+<details>
+<summary><b>🎅 Progreso 2015</b> — Java 6/25 días</summary>
 
 | Día | ☕ Java | 🐍 Python | 🦀 Rust | 🟣 C# | ⚙️ C++ |
 |:---:|:---:|:---:|:---:|:---:|:---:|
@@ -82,12 +106,14 @@ Cada celda enlaza a la solución (✅) o queda pendiente (⬜). El número de d�
 | [24](https://adventofcode.com/2015/day/24) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 | [25](https://adventofcode.com/2015/day/25) | ⬜ | ⬜ | ⬜ | ⬜ | ⬜ |
 
+</details>
+
 **Leyenda:** ✅ resuelto (enlaza al código) · ⬜ pendiente
 
 **Totales:** ☕ Java 18 días (2025: 12/12 · 2015: 6/25) · resto de lenguajes: 0.
 
 <details>
-<summary>⏱️ Detalle de Java (dificultad y tiempos)</summary>
+<summary><b>⏱️ Detalles de Java</b> — dificultad y tiempos</summary>
 
 **2025**
 
@@ -118,7 +144,12 @@ Cada celda enlaza a la solución (✅) o queda pendiente (⬜). El número de d�
 
 ```
 Advent_of_Code/
-├── java/ python/ rust/ csharp/ cpp/   # un directorio por lenguaje
+├── java/      # src/{core,utils,years,year_YYYY,utils_YYYY}
+├── python/    # aoc/ (núcleo) + yYYYY/dayNN.py
+├── rust/      # Cargo.toml, build.rs, src/{main,aoc}.rs, src/solutions/yYYYY/
+├── csharp/    # AdventOfCode.csproj, Core/, Solutions/YYYYYY/
+├── cpp/       # CMakeLists.txt, src/core/, src/solutions/yYYYY/
+├── scripts/new_day.py                 # generador de esqueletos
 ├── inputs/<año>/dayNN.txt             # LOCAL, ignorado por git
 ├── enunciados/<año>/dayNN.md          # LOCAL, ignorado por git
 ├── docs/CONVENCIONES.md               # contrato común
@@ -137,10 +168,10 @@ cd java                               # o el lenguaje que quieras; ver su README
 
 ## ➕ Añadir una solución
 
-1. Escribe el día en la carpeta de su lenguaje (ver el README de cada uno).
+1. Genera y escribe el día (ver [el resumen](#-resumen-cómo-empezar-una-solución)).
 2. En la tabla del año de este README, cambia ⬜ por `[✅](ruta/a/la/solución)` en la columna del lenguaje.
-3. Año nuevo: copia una tabla de año, cambia el título y el nº de días (el enlace al puzzle sigue el patrón `https://adventofcode.com/<año>/day/<n>`).
-4. Lenguaje nuevo: sigue «Añadir un lenguaje nuevo» en [docs/CONVENCIONES.md](docs/CONVENCIONES.md) y cambia su badge de «pendiente» a la versión usada.
+3. Año nuevo: copia un bloque `<details>` de año y cambia el título y el nº de días (el puzzle es `https://adventofcode.com/<año>/day/<n>`).
+4. Lenguaje nuevo: sigue «Añadir un lenguaje nuevo» en [docs/CONVENCIONES.md](docs/CONVENCIONES.md).
 5. Commit por solución, p. ej. `feat(2025): día 3 en Rust`.
 
 ## 🔒 Enunciados e inputs: no incluidos

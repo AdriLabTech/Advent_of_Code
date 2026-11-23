@@ -1,20 +1,29 @@
-# Rust
+# 🦀 Rust
 
-Estado: **sin empezar** (estructura preparada, ningún día resuelto).
+Estilo: **funciones libres + registro generado en compilación**. `build.rs` escanea `src/solutions/y*/day*.rs` y genera el registro, así que un día nuevo es un fichero y no hay que tocar `mod` ni `main.rs`.
 
-Sigue el contrato de [../docs/CONVENCIONES.md](../docs/CONVENCIONES.md):
+Requisitos: Rust estable (edición 2024), cargo. Sin dependencias externas.
 
-- Input: `../inputs/<año>/dayNN.txt` (o `AOC_INPUTS_DIR`). No se versiona.
-- Cada día expone `part1` y `part2` y devuelve texto.
-- Ejecutor por año/día con tiempo de ejecución.
-
-## Requisitos
-- Rust estable (rustup), cargo
-
-## Estructura sugerida
 ```
 rust/
-├── Cargo.toml      # workspace o crate único
-└── src/y2025/day01.rs
+├── Cargo.toml
+├── build.rs                 # genera el registro de días
+├── src/
+│   ├── main.rs              # CLI y ejecutor
+│   ├── aoc.rs               # read_input, ints, paragraphs, tipo Answer
+│   └── solutions/y2025/day01.rs   # una solución = un fichero
+└── templates/day.rs.tpl
 ```
-Ejecución prevista: `cargo run --release -- 2025 1`
+
+## Crear un día
+```bash
+scripts/new_day.py rust 2025 3       # desde la raíz del repo
+```
+Edita `part1(input: &str) -> Answer` y `part2`. Devuelve `Some(resultado.to_string())` (`None` = pendiente).
+
+## Ejecutar (desde `rust/`)
+```bash
+cargo run --release -- 2025 3
+cargo run --release -- 2025             # todo el año
+cargo run --release -- 2025 3 --example
+```

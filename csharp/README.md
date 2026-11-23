@@ -1,20 +1,29 @@
-# C#
+# 🟣 C#
 
-Estado: **sin empezar** (estructura preparada, ningún día resuelto).
+Estilo: **POO ligera con descubrimiento por reflexión**. Cada día hereda de `Day`; el año y el día se deducen del namespace y del nombre de la clase (`AdventOfCode.Solutions.Y2025.Day03`), sin registro manual.
 
-Sigue el contrato de [../docs/CONVENCIONES.md](../docs/CONVENCIONES.md):
+Requisitos: .NET SDK 10 (`net10.0`; cambia `TargetFramework` en el `.csproj` si usas otro).
 
-- Input: `../inputs/<año>/dayNN.txt` (o `AOC_INPUTS_DIR`). No se versiona.
-- Cada día expone `part1` y `part2` y devuelve texto.
-- Ejecutor por año/día con tiempo de ejecución.
-
-## Requisitos
-- .NET SDK 8+
-
-## Estructura sugerida
 ```
 csharp/
 ├── AdventOfCode.csproj
-└── Y2025/Day01.cs
+├── Core/
+│   ├── Day.cs           # clase base (Part1/Part2)
+│   ├── Input.cs         # lectura de inputs, Ints, Paragraphs
+│   └── Runner.cs        # descubre y ejecuta los días (Main)
+├── Solutions/Y2025/Day03.cs   # una solución = un fichero
+└── templates/Day.cs.tpl
 ```
-Ejecución prevista: `dotnet run -c Release -- 2025 1`
+
+## Crear un día
+```bash
+scripts/new_day.py csharp 2025 3     # desde la raíz del repo
+```
+Edita `Part1(string[] lines)` y `Part2`; devuelven `object?` (`null` = pendiente).
+
+## Ejecutar (desde `csharp/`)
+```bash
+dotnet run -c Release -- 2025 3
+dotnet run -c Release -- 2025             # todo el año
+dotnet run -c Release -- 2025 3 --example
+```
