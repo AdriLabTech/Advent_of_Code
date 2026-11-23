@@ -1,200 +1,83 @@
 package utils_2025;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 import utils.Utils;
 
 public class Utils_Day02 {
 
-    public static long solvePart1(int year, int day) throws IOException {
-        List<String> lines = Utils.readInput(year, day);
-        long totalSum = 0;
-
-        for (String line : lines) {
-            if (line.isBlank()) {
-                continue;
-            }
-
-            String[] ranges = line.split(",");
-            for (String range : ranges) {
-                String[] parts = range.split("-");
-                long L = Long.parseLong(parts[0]);
-                long R = Long.parseLong(parts[1]);
-                totalSum += Utils_Day02.sumInvalidInRange(L, R);
+    public static String solvePart1(int year, int day) throws IOException {
+        // ID inválido = un bloque repetido exactamente dos veces: periodo = mitad de los dígitos
+        BigInteger total = BigInteger.ZERO;
+        for (long[] rango : rangos(Utils.readInput(year, day))) {
+            for (int largo = 2; largo <= String.valueOf(rango[1]).length(); largo += 2) {
+                total = total.add(sumaConPeriodo(rango[0], rango[1], largo, largo / 2));
             }
         }
-
-        return totalSum;
+        return total.toString();
     }
 
-    public static long solvePart2(int year, int day) throws IOException {
-        List<String> lines = Utils.readInput(year, day);
-        long total = 0;
-
-        for (String line : lines) {
-            if (line.isBlank()) {
-                continue;
-            }
-
-            String[] rangesStr = line.split(",");
-            List<long[]> ranges = new ArrayList<>();
-            long globalMax = 0;
-            for (String range : rangesStr) {
-                String[] parts = range.split("-");
-                long a = Long.parseLong(parts[0]);
-                long b = Long.parseLong(parts[1]);
-                ranges.add(new long[] { a, b });
-                if (b > globalMax)
-                    globalMax = b;
-            }
-
-            TreeSet<Long> invalidSet = Utils_Day02.generateInvalidNumbers(globalMax);
-            List<Long> invalidList = new ArrayList<>(invalidSet);
-
-            for (long[] range : ranges) {
-                long a = range[0];
-                long b = range[1];
-                int startIdx = Utils_Day02.lowerBound(invalidList, a);
-                for (int i = startIdx; i < invalidList.size(); i++) {
-                    long num = invalidList.get(i);
-                    if (num > b)
-                        break;
-                    total += num;
+    public static String solvePart2(int year, int day) throws IOException {
+        // Ahora vale cualquier número de repeticiones (>= 2): un periodo p < largo que divida al largo.
+        // Un mismo número puede tener varios periodos (111111 -> 1, 2 y 3), así que se suma por periodo
+        // mínimo exacto: g[p] = (números con periodo p) - (los que ya tienen un periodo menor que divide a p)
+        BigInteger total = BigInteger.ZERO;
+        for (long[] rango : rangos(Utils.readInput(year, day))) {
+            for (int largo = 2; largo <= String.valueOf(rango[1]).length(); largo++) {
+                List<int[]> periodos = new ArrayList<>();
+                List<BigInteger> sumas = new ArrayList<>();
+                for (int p = 1; p < largo; p++) {
+                    if (largo % p != 0) {
+                        continue;
+                    }
+                    BigInteger valor = sumaConPeriodo(rango[0], rango[1], largo, p);
+                    for (int i = 0; i < periodos.size(); i++) {
+                        if (p % periodos.get(i)[0] == 0) {
+                            valor = valor.subtract(sumas.get(i));
+                        }
+                    }
+                    periodos.add(new int[] { p });
+                    sumas.add(valor);
+                }
+                for (BigInteger suma : sumas) {
+                    total = total.add(suma);
                 }
             }
         }
-        return total;
+        return total.toString();
     }
 
     /**
-     * Calculates the sum of all invalid numbers within the specified inclusive
-     * range [L, R].
-     * A number is considered invalid if all its digits are either all even or all
-     * odd.
-     *
-     * @param L -> the left bound of the range (inclusive)
-     * @param R -> the right bound of the range (inclusive)
-     * @return ->the sum of all invalid numbers between L and R
+     * Suma de los números de {@code largo} dígitos en [a, b] formados repitiendo un
+     * bloque de {@code periodo} dígitos.
      */
-    public static long sumInvalidInRange(long L, long R) {
-        long sum = 0;
-        for (long num = L; num <= R; num++) {
-            if (!tieneParYImpar(num)) {
-                sum += num;
+    private static BigInteger sumaConPeriodo(long a, long b, int largo, int periodo) {
+        BigInteger diezLargo = BigInteger.TEN.pow(largo);
+        BigInteger diezPeriodo = BigInteger.TEN.pow(periodo);
+        BigInteger desde = BigInteger.valueOf(a).max(BigInteger.TEN.pow(largo - 1));
+        BigInteger hasta = BigInteger.valueOf(b).min(diezLargo.subtract(BigInteger.ONE));
+        BigInteger m = diezLargo.subtract(BigInteger.ONE).divide(diezPeriodo.subtract(BigInteger.ONE)); // n = x * m
+        BigInteger menor = BigInteger.TEN.pow(periodo - 1).max(desde.add(m).subtract(BigInteger.ONE).divide(m));
+        BigInteger mayor = diezPeriodo.subtract(BigInteger.ONE).min(hasta.divide(m));
+        if (menor.compareTo(mayor) > 0) {
+            return BigInteger.ZERO;
+        }
+        return m.multiply(menor.add(mayor)).multiply(mayor.subtract(menor).add(BigInteger.ONE)).shiftRight(1);
+    }
+
+    /** Líneas 'a-b,c-d,...' como lista de {a, b}. */
+    private static List<long[]> rangos(List<String> lines) {
+        List<long[]> rangos = new ArrayList<>();
+        for (String line : lines) {
+            for (String r : line.split(",")) {
+                if (!r.isBlank()) {
+                    String[] p = r.trim().split("-");
+                    rangos.add(new long[] { Long.parseLong(p[0]), Long.parseLong(p[1]) });
+                }
             }
         }
-        return sum;
-    }
-
-    /**
-     * Determines whether a number contains at least one even digit AND one odd
-     * digit.
-     *
-     * @param num -> the number to check
-     * @return -> true if the number contains both even and odd digits, false
-     *         otherwise
-     */
-    private static boolean tieneParYImpar(long num) {
-        boolean tienePar = false;
-        boolean tieneImpar = false;
-        String s = String.valueOf(num);
-        for (char c : s.toCharArray()) {
-            int digito = c - '0';
-            if (digito % 2 == 0) {
-                tienePar = true;
-            } else {
-                tieneImpar = true;
-            }
-            if (tienePar && tieneImpar)
-                return true;
-        }
-        return false;
-    }
-
-    /**
-     * Generates a sorted set of invalid numbers up to a specified maximum value.
-     * Invalid numbers are those composed entirely of even digits or entirely of odd
-     * digits.
-     *
-     * @param maxVal -> the maximum number to generate up to
-     * @return -> a TreeSet containing all invalid numbers ≤ maxVal
-     */
-    public static TreeSet<Long> generateInvalidNumbers(long maxVal) {
-        TreeSet<Long> invalidSet = new TreeSet<>();
-        long limit = Math.max(maxVal, 10000000000L); // Up to 10 digits
-
-        // Generate numbers with all even digits
-        generarNumerosPares(0, 10, 0, invalidSet, limit);
-
-        // Generate numbers with all odd digits
-        generarNumerosImpares(0, 10, 0, invalidSet, limit);
-
-        return invalidSet;
-    }
-
-    /**
-     * Recursively generates numbers composed entirely of even digits.
-     *
-     * @param current   -> the current number being built
-     * @param maxDigits -> maximum number of digits allowed
-     * @param depth     -> current recursion depth (number of digits used)
-     * @param set       -> the set to add valid numbers to
-     * @param limit     -> maximum allowed number value
-     */
-    private static void generarNumerosPares(long current, int maxDigits, int depth, Set<Long> set, long limit) {
-        if (current > limit || depth > maxDigits)
-            return;
-        if (current > 0 && depth > 0)
-            set.add(current);
-
-        for (int d = 0; d <= 8; d += 2) {
-            generarNumerosPares(current * 10 + d, maxDigits, depth + 1, set, limit);
-        }
-    }
-
-    /**
-     * Recursively generates numbers composed entirely of odd digits.
-     *
-     * @param current   -> the current number being built
-     * @param maxDigits -> maximum number of digits allowed
-     * @param depth     -> current recursion depth (number of digits used)
-     * @param set       -> the set to add valid numbers to
-     * @param limit     -> maximum allowed number value
-     */
-    private static void generarNumerosImpares(long current, int maxDigits, int depth, Set<Long> set, long limit) {
-        if (current > limit || depth > maxDigits)
-            return;
-        if (current > 0 && depth > 0)
-            set.add(current);
-
-        for (int d = 1; d <= 9; d += 2) {
-            generarNumerosImpares(current * 10 + d, maxDigits, depth + 1, set, limit);
-        }
-    }
-
-    /**
-     * Performs binary search to find the first index where the element is ≥ target.
-     * Equivalent to lower_bound in C++.
-     *
-     * @param list   -> the sorted list to search
-     * @param target -> the target value
-     * @return -> the first index where list.get(index) ≥ target, or list.size() if
-     *         no
-     *         such element
-     */
-    public static int lowerBound(List<Long> list, long target) {
-        int left = 0, right = list.size() - 1;
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            if (list.get(mid) < target) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
-            }
-        }
-        return left;
+        return rangos;
     }
 }

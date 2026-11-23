@@ -14,6 +14,23 @@ public class Utils {
     // ==========|| Generals Methods ||==========//
 
     /**
+     * Carpeta común de inputs (compartida por todos los lenguajes): inputs/ en la raíz del repo.
+     * Orden: variable AOC_INPUTS_DIR; si no, se busca "inputs" subiendo desde el directorio actual.
+     */
+    private static Path inputsDir() {
+        String env = System.getenv("AOC_INPUTS_DIR");
+        if (env != null && !env.isEmpty()) {
+            return Paths.get(env);
+        }
+        for (Path dir = Paths.get("").toAbsolutePath(); dir != null; dir = dir.getParent()) {
+            if (Files.isDirectory(dir.resolve("inputs"))) {
+                return dir.resolve("inputs");
+            }
+        }
+        return Paths.get("..", "inputs");
+    }
+
+    /**
      * read the inputs and save in a String ArrayList
      * 
      * @param year -> Number year of calendar
@@ -22,10 +39,7 @@ public class Utils {
      * @throws IOException -> If the path dont match
      */
     public static List<String> readInput(int year, int day) throws IOException {
-        // Los inputs viven fuera de java/ (compartidos entre lenguajes): inputs/<año>/dayNN.txt
-        // Por defecto se asume que se ejecuta desde java/; se puede cambiar con AOC_INPUTS_DIR.
-        String base = System.getenv().getOrDefault("AOC_INPUTS_DIR", "../inputs");
-        Path path = Paths.get(base, String.valueOf(year), String.format("day%02d.txt", day));
+        Path path = inputsDir().resolve(String.valueOf(year)).resolve(String.format("day%02d.txt", day));
         return Files.readAllLines(path);
     }
 

@@ -1,11 +1,14 @@
 package utils_2015;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+import utils.Utils;
+
 public class Utils_Day04 {
-    public static long solvePart1(int year, int day) {
-        String input = "ckczppom";
+    public static long solvePart1(int year, int day) throws IOException {
+        String input = Utils.readInput(year, day).get(0).trim();
         int clave = 0;
         for (int i = 0; !comprobarHash(getMD5Hash(input + i), 5); i++) {
             clave++;
@@ -13,8 +16,8 @@ public class Utils_Day04 {
         return clave;
     }
 
-    public static long solvePart2(int year, int day) {
-        String input = "ckczppom";
+    public static long solvePart2(int year, int day) throws IOException {
+        String input = Utils.readInput(year, day).get(0).trim();
         int clave = 0;
         for (int i = 0; !comprobarHash(getMD5Hash(input + i), 6); i++) {
             clave++;

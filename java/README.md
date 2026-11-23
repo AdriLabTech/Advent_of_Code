@@ -26,4 +26,4 @@ Crea `Day_03_2025` y `Utils_Day03`, y **registra el día** en `Year_2025` (y el 
 javac -d bin $(find src -name '*.java')
 java -cp bin core.Main
 ```
-Los inputs se leen de `../inputs/<año>/dayNN.txt` (o `AOC_INPUTS_DIR`). Java no soporta `--example`.
+Los inputs se leen de `inputs/<año>/dayNN.txt` en la raíz del repo, lo encuentre desde donde ejecutes (o `AOC_INPUTS_DIR`). Java no soporta `--example`.

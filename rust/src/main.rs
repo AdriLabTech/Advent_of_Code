@@ -1,4 +1,5 @@
 mod aoc;
+mod md5;
 
 use aoc::Answer;
 use std::time::Instant;

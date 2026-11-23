@@ -8,143 +8,82 @@ import utils.Utils;
 
 public class Utils_Day08 {
 
+    private static final int CONEXIONES = 1000; // pares más cercanos que se conectan en la parte 1
+    private static final int CONEXIONES_EJEMPLO = 10; // el ejemplo del enunciado (20 cajas) conecta solo 10
+
     public static long solvePart1(int year, int day) throws IOException {
-        List<String> lines = Utils.readInput(year, day);
-        int N = lines.size();
-        int[] x = new int[N];
-        int[] y = new int[N];
-        int[] z = new int[N];
+        int[][] cajas = leer(Utils.readInput(year, day));
+        int[] tamanos = conectar(cajas, cajas.length <= 20 ? CONEXIONES_EJEMPLO : CONEXIONES, null);
 
-        // Parse junction box coordinates from input
-        for (int i = 0; i < N; i++) {
-            String[] parts = lines.get(i).split(",");
-            x[i] = Integer.parseInt(parts[0]);
-            y[i] = Integer.parseInt(parts[1]);
-            z[i] = Integer.parseInt(parts[2]);
-        }
-
-        // Generate all possible pairs of boxes with their squared distances
-        // We use squared distance to avoid unnecessary square root calculations
-        List<Pair> pairs = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            for (int j = i + 1; j < N; j++) {
-                long dx = x[i] - x[j];
-                long dy = y[i] - y[j];
-                long dz = z[i] - z[j];
-                long distSQ = dx * dx + dy * dy + dz * dz;
-                pairs.add(new Pair(i, j, distSQ));
+        // Producto de los tres circuitos más grandes
+        List<Integer> circuitos = new ArrayList<>();
+        for (int t : tamanos) {
+            if (t > 0) {
+                circuitos.add(t);
             }
         }
-
-        // Sort pairs by distance (closest first)
-        // This allows us to process the shortest connections first
-        Collections.sort(pairs);
-
-        // Initialize Union-Find structure to manage circuits
-        // Each box starts as its own independent circuit
-        int[] parent = new int[N];
-        int[] size = new int[N];
-        for (int i = 0; i < N; i++) {
-            parent[i] = i;
-            size[i] = 1;
-        }
-
-        // Make connections: connect the 1000 closest pairs that join different circuits
-        int connections = 0;
-        for (Pair p : pairs) {
-            int rootI = Utils_Day08.find(p.i, parent);
-            int rootJ = Utils_Day08.find(p.j, parent);
-
-            // Only connect if the boxes are in different circuits
-            if (rootI != rootJ) {
-                // Merge circuits using union by size to keep the tree balanced
-                if (size[rootI] < size[rootJ]) {
-                    parent[rootI] = rootJ;
-                    size[rootJ] += size[rootI];
-                } else {
-                    parent[rootJ] = rootI;
-                    size[rootI] += size[rootJ];
-                }
-                connections++; // Increment successful connections counter
-
-                // Stop after 1000 successful connections
-                if (connections == 1000) {
-                    break;
-                }
-            }
-        }
-
-        // Collect sizes of all circuits (only the Union-Find roots)
-        List<Integer> circuitSizes = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            if (parent[i] == i) { // A root represents a complete circuit
-                circuitSizes.add(size[i]);
-            }
-        }
-
-        // Sort circuit sizes from largest to smallest
-        circuitSizes.sort(Collections.reverseOrder());
-
-        // Calculate the product of the three largest circuits
-        // Initialize to 1 because we will multiply
+        circuitos.sort(Collections.reverseOrder());
         long result = 1;
-        for (int i = 0; i < Math.min(3, circuitSizes.size()); i++) {
-            result *= circuitSizes.get(i);
+        for (int i = 0; i < Math.min(3, circuitos.size()); i++) {
+            result *= circuitos.get(i);
         }
-
         return result;
     }
 
     public static long solvePart2(int year, int day) throws IOException {
-        List<String> lines = Utils.readInput(year, day);
-        int N = lines.size();
-        int[] x = new int[N];
-        int[] y = new int[N];
-        int[] z = new int[N];
+        int[][] cajas = leer(Utils.readInput(year, day));
+        int[] ultimo = new int[2];
+        conectar(cajas, -1, ultimo); // la última unión es la que deja un solo circuito
+        return (long) cajas[ultimo[0]][0] * cajas[ultimo[1]][0];
+    }
 
-        // Parse junction box coordinates
-        for (int i = 0; i < N; i++) {
-            String[] parts = lines.get(i).split(",");
-            x[i] = Integer.parseInt(parts[0]);
-            y[i] = Integer.parseInt(parts[1]);
-            z[i] = Integer.parseInt(parts[2]);
-        }
-
-        // Generate all possible pairs of boxes with their squared distances
-        List<Pair> pairs = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            for (int j = i + 1; j < N; j++) {
-                long dx = x[i] - x[j];
-                long dy = y[i] - y[j];
-                long dz = z[i] - z[j];
-                long distSQ = dx * dx + dy * dy + dz * dz;
-                pairs.add(new Pair(i, j, distSQ));
+    private static int[][] leer(List<String> lines) {
+        List<int[]> cajas = new ArrayList<>();
+        for (String line : lines) {
+            if (!line.isBlank()) {
+                String[] p = line.split(",");
+                cajas.add(new int[] { Integer.parseInt(p[0].trim()), Integer.parseInt(p[1].trim()),
+                        Integer.parseInt(p[2].trim()) });
             }
         }
+        return cajas.toArray(new int[0][]);
+    }
 
-        // Sort pairs by distance (closest first)
-        Collections.sort(pairs);
+    /**
+     * Recorre los pares por distancia creciente (Kruskal) y une los circuitos de
+     * cada par. Se detiene tras {@code limitePares} pares (cuenten o no como unión;
+     * -1 = sin límite) o al quedar un solo circuito. Devuelve el tamaño de cada
+     * circuito (0 si no es raíz) y deja en {@code ultimo} el último par que unió dos
+     * circuitos distintos.
+     */
+    private static int[] conectar(int[][] cajas, int limitePares, int[] ultimo) {
+        int n = cajas.length;
+        List<Pair> pares = new ArrayList<>();
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                long dx = cajas[i][0] - cajas[j][0];
+                long dy = cajas[i][1] - cajas[j][1];
+                long dz = cajas[i][2] - cajas[j][2];
+                pares.add(new Pair(i, j, dx * dx + dy * dy + dz * dz));
+            }
+        }
+        Collections.sort(pares); // estable: empates por orden de generación (i, j)
 
-        // Initialize Union-Find structure: each box is its own circuit
-        int[] parent = new int[N];
-        int[] size = new int[N];
-        for (int i = 0; i < N; i++) {
+        int[] parent = new int[n];
+        int[] size = new int[n];
+        for (int i = 0; i < n; i++) {
             parent[i] = i;
             size[i] = 1;
         }
-
-        // Initialize component counter and variables for the last connection
-        int components = N; // Initially, each box is an independent circuit
-        int lastI = -1, lastJ = -1; // Indices of the last successful connection
-
-        // Process pairs in increasing distance order
-        for (Pair p : pairs) {
-            int rootI = Utils_Day08.find(p.i, parent);
-            int rootJ = Utils_Day08.find(p.j, parent);
-
-            // Only connect if they are in different circuits
-            if (rootI != rootJ) {
-                // Merge the two circuits (union by size for efficiency)
+        int circuitos = n;
+        for (int visitados = 0; visitados < pares.size(); visitados++) {
+            if (visitados == limitePares || circuitos == 1) {
+                break;
+            }
+            Pair p = pares.get(visitados);
+            int rootI = find(p.i, parent);
+            int rootJ = find(p.j, parent);
+            if (rootI != rootJ) { // si ya estaban en el mismo circuito no pasa nada
                 if (size[rootI] < size[rootJ]) {
                     parent[rootI] = rootJ;
                     size[rootJ] += size[rootI];
@@ -152,24 +91,18 @@ public class Utils_Day08 {
                     parent[rootJ] = rootI;
                     size[rootI] += size[rootJ];
                 }
-
-                // Save the indices of this successful connection
-                lastI = p.i;
-                lastJ = p.j;
-                components--; // Reduce the number of independent circuits
-
-                // Check if we already have a single circuit
-                if (components == 1) {
-                    // All boxes are connected. This was the last needed connection
-                    break;
+                circuitos--;
+                if (ultimo != null) {
+                    ultimo[0] = p.i;
+                    ultimo[1] = p.j;
                 }
             }
         }
-
-        // Multiply the X coordinates of the last connection that unified all circuits
-        // We use long to avoid integer overflow
-        long result = (long) x[lastI] * (long) x[lastJ];
-        return result;
+        int[] tamanos = new int[n];
+        for (int i = 0; i < n; i++) {
+            tamanos[i] = parent[i] == i ? size[i] : 0;
+        }
+        return tamanos;
     }
 
     // Helper class to represent pairs of boxes with their distance

@@ -44,6 +44,13 @@ Answer ans(const T& value) {
     return os.str();
 }
 
+/// Versión para enteros de 128 bits (ostream no sabe imprimirlos): return ans(valor);
+inline Answer ans(unsigned __int128 value) {
+    std::string out = value == 0 ? "0" : "";
+    for (; value > 0; value /= 10) out.insert(out.begin(), static_cast<char>('0' + static_cast<int>(value % 10)));
+    return out;
+}
+
 /// Todos los enteros (con signo) que aparecen en un texto.
 inline std::vector<long long> ints(const std::string& text) {
     static const std::regex re(R"(-?\d+)");
