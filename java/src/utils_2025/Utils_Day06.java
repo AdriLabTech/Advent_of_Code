@@ -12,7 +12,6 @@ import utils.Utils;
 
 public class Utils_Day06 {
 
-    public static final char[] solvePart1 = null;
 
     public static BigInteger solvePart1(int year, int day) throws IOException {
         List<String> lines = Utils.readInput(year, day);
@@ -74,6 +73,7 @@ public class Utils_Day06 {
         BigInteger suma = BigInteger.ZERO;
         BigInteger sumaTotal = BigInteger.ZERO;
         boolean multi = false;
+        boolean grupoCerrado = true;
         for (List<String> line : mathMap.values()) {
             if (line.get(line.size() - 1).equals("+")) {
                 multi = false;
@@ -88,9 +88,13 @@ public class Utils_Day06 {
                 valorLinea += line.get(i);
             }
             if (valorLinea.isBlank()) {
-                sumaTotal = sumaTotal.add(suma);
+                if (!grupoCerrado) {
+                    sumaTotal = sumaTotal.add(suma);
+                }
+                grupoCerrado = true;
                 continue;
             }
+            grupoCerrado = false;
             BigInteger val = new BigInteger(valorLinea.trim());
             if (multi) {
                 if (suma.equals(BigInteger.ZERO)) {
@@ -101,6 +105,9 @@ public class Utils_Day06 {
             } else {
                 suma = suma.add(val);
             }
+        }
+        if (!grupoCerrado) {
+            sumaTotal = sumaTotal.add(suma); // último grupo sin columna vacía detrás
         }
         return sumaTotal;
     }

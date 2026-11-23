@@ -19,7 +19,7 @@ public class Day_06_2025 extends Day {
 
     @Override
     public String solvePart1() throws IOException {
-        return String.valueOf(Utils_Day06.solvePart1);
+        return String.valueOf(Utils_Day06.solvePart1(year, day));
     }
 
     @Override
